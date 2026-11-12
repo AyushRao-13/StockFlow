@@ -1,0 +1,296 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Profile</title>
+</head>
+<style>
+    .profile-container {
+        display: flex;
+        margin-top: 5%;
+        backdrop-filter: blur(18.3px);
+        -webkit-backdrop-filter: blur(18.3px);
+        padding: 2em;
+        width: 80%;
+        margin-left: 20%;
+    }
+
+    .profile-left {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 25%;
+        padding: 1em;
+        background-color: rgba(255, 255, 255, 0.75);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.125);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        backdrop-filter: blur(25px) saturate(180%)
+    }
+
+    .faculty-image {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border: 2px solid goldenrod;
+        margin-bottom: 20px;
+        transform: scale(1);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .faculty-image:hover {
+        transform: scale(1.05);
+    }
+
+    .faculty-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .faculty-name p {
+        font-size: 18px;
+        color: #777;
+        margin: 0;
+    }
+
+    .profile-right {
+        background-color: #021932fc;
+        margin: 0 0 0 2%;
+        padding: 50px;
+        border-radius: 10px;
+        border: 4px solid var(--button-color);
+        width: 60%;
+    }
+
+    .faculty-dept {
+        font-size: 18px;
+        font-weight: bold;
+        color: white;
+        margin-bottom: 10px;
+    }
+
+    .faculty-qualification,
+    .faculty-email {
+        font-size: 16px;
+        color: white;
+        margin: 5px 0;
+    }
+
+    .dept-heading,
+    .qualification-heading,
+    .email-heading {
+        color: wheat;
+        font-weight: 400;
+    }
+
+    .profile-actions {
+        margin-top: 20px;
+    }
+
+    .contact-admin-button,
+    .logout-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #fff;
+        transition: background-color 0.3s ease;
+    }
+
+    .contact-admin-button {
+        background-color: #007bff;
+        /* position: absolute; */
+        /* right: 18%; */
+        /* bottom: 10%; */
+    }
+
+    .logout-button {
+        margin-left: 10px;
+        background-color: #dc3545;
+        /* position: absolute; */
+        /* right: 5%; */
+        width: 15%;
+        /* bottom: 10%; */
+    }
+
+    .contact-admin-button:hover {
+        background-color: rgb(37, 116, 181);
+    }
+
+    .logout-button:hover {
+        background-color: rgb(199, 52, 52);
+    }
+
+    @media (min-width:300px) and (max-width: 400px) {
+        .profile-container {
+            flex-direction: column;
+        }
+
+        .profile-left {
+            width: 96%;
+            margin-left: -3%;
+            margin-bottom: 20px;
+        }
+
+        .profile-right {
+            margin-left: -5%;
+            padding: 20px;
+            width: 95%;
+            padding-bottom: 14%;
+        }
+
+        .logout-button {
+            margin-left: 10px;
+            background-color: #dc3545;
+            position: absolute;
+            right: 6%;
+            bottom: 5%;
+            width: 35%;
+        }
+
+        .contact-admin-button {
+            background-color: #007bff;
+            position: absolute;
+            right: 42%;
+            bottom: 5%;
+            width: 50%;
+        }
+    }
+
+    @media (min-width:400px) and (max-width: 701px) {
+        .profile-container {
+            flex-direction: column;
+            padding-left: 11%;
+            padding-right: 6%;
+            margin-left: -3%;
+            margin-top: 7%;
+        }
+
+        .profile-left {
+            width: 100%;
+            margin-left: -4%;
+            margin-bottom: 20px;
+            margin-top: 2%;
+        }
+
+        .profile-right {
+            margin-left: -5%;
+            padding: 20px;
+            width: 100%;
+            padding-bottom: 14%;
+            padding-right: 2%;
+        }
+
+        .logout-button {
+            margin-left: 10px;
+            background-color: #dc3545;
+            position: absolute;
+            right: 6%;
+            width: 39%;
+            bottom: 5%;
+        }
+
+        .contact-admin-button {
+            background-color: #007bff;
+            position: absolute;
+            right: 46%;
+            bottom: 5%;
+            width: 45%;
+        }
+    }
+
+    @media (min-width:701px) and (max-width: 1024px) {
+        .profile-container {
+            justify-content: space-between;
+            margin-top: 12%;
+        }
+
+        .profile-right {
+            width: 100%;
+            padding-bottom: 15%;
+        }
+
+        .profile-left {
+            width: 96%;
+            margin-right: 5%;
+        }
+
+        .logout-button {
+            margin-left: 10px;
+            background-color: #dc3545;
+            position: absolute;
+            right: 7.5%;
+            width: 40%;
+            bottom: 8%;
+        }
+
+        .contact-admin-button {
+            background-color: #007bff;
+            position: absolute;
+            right: 7.5%;
+            bottom: 16%;
+            width: 40%;
+        }
+    }
+</style>
+
+<body>
+    {% include 'sidebar.html' %}
+    <div class="profile-container">
+        <div class="profile-left">
+            <img class="faculty-image" src="{% static 'images/Faculty.jpg' %}" alt="Faculty" />
+            <div class="faculty-name">
+                <h2>Mr.SP Chauhan</h2>
+                <p>Assistent Professor</p>
+            </div>
+        </div>
+        <div class="profile-right">
+            <div class="profile-item">
+                <h3 class="dept-heading">
+                    <FontAwesomeIcon icon={faBuilding} class="icon" />
+                    Department
+                </h3>
+                <h3 class="faculty-dept">BCA</h3>
+            </div>
+            <hr />
+            <div class="profile-item">
+                <h3 class="qualification-heading">
+                    <FontAwesomeIcon icon={faGraduationCap} class="icon" />
+                    Qualifications
+                </h3>
+                <h3 class="faculty-qualification">
+                    BCA, MCA
+                </h3>
+            </div>
+            <hr />
+            <div class="profile-item">
+                <h3 class="email-heading">
+                    <FontAwesomeIcon icon={faEnvelope} class="icon" /> Email
+                </h3>
+                <h3 class="faculty-email">SPchauhan123@msijanakpuri.com</h3>
+            </div>
+            <hr />
+            <div class="profile-actions">
+                <button class="contact-admin-button" onClick={contactAdmin}>
+                    <FontAwesomeIcon icon={faUser} class="action-icon" />
+                    Contact Admin
+                </button>
+                <button class="logout-button" onClick={onLogoutClick}>
+                    <FontAwesomeIcon icon={faSignOutAlt} class="action-icon" />
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

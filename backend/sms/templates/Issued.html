@@ -1,0 +1,377 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Issued</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+  <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/searchpanes/2.2.0/css/searchPanes.bootstrap5.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap5.min.css" rel="stylesheet">
+
+  <!-- CSS cdn for date filters-->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.5.1/css/dataTables.dateTime.min.css">
+
+
+</head>
+
+<style>
+  .dropdown-container {
+    position: relative;
+    width: 200px;
+    margin-bottom: 15px;
+  }
+
+  select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #8f8888;
+    border-radius: 4px;
+    box-sizing: border-box;
+    appearance: none;
+    background-color: #fff;
+    cursor: pointer;
+  }
+
+  select:hover {
+    background-color: rgba(249, 245, 245, 0.66);
+  }
+
+  .filters {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.filter-emp, .filter-dept,
+.filter-date {
+  margin-right: 30px;
+}
+
+.date-inputs {
+  display: flex;
+  align-items: center;
+}
+
+.date-input {
+  margin-right: 20px;
+}
+
+.date-input input{
+  padding: 6px;
+}
+.date-input label {
+  margin-right: 5px;
+}
+
+
+</style>
+
+<body class="body">
+  <div class="sidebar">
+    <div class="container">
+      {% include 'sidebar.html' %}
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end custom-margin">
+    <div>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newEntryModal">
+        Issue Item
+      </button>
+      <a href="{% url 'export_issued_csv' %}" class="btn btn-primary">Export CSV</a>
+    </div>
+    <div class="position-fixed top-0 start-50 translate-middle-x p-2" style="width: 50%;">
+      {% for message in messages %}
+      <div
+        class="alert alert-{{ message.tags }} alert-dismissible fade show {% if message.tags == 'error' %}alert-danger{% endif %}"
+        role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+
+  <!-- Include DataTables JS -->
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdn.datatables.net/searchpanes/2.2.0/js/dataTables.searchPanes.min.js"></script>
+  <script src="https://cdn.datatables.net/searchpanes/2.2.0/js/searchPanes.bootstrap5.min.js"></script>
+  <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+
+  <!-- For date filters-->
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+<script src="https://cdn.datatables.net/datetime/1.5.1/js/dataTables.dateTime.min.js"></script>
+
+  <div class="Table-container">
+    <h3>Issued History</h3>
+
+    <div class="filters">
+      <div class="filter-emp">
+        <label for="employee-filter" class="form-label">Filter by Employee:</label>
+        <div class="dropdown-container">
+          <select id="employee-filter" class="custom-dropdown">
+            <option value="" selected disabled>Select Employee</option>
+            {% for faculty in faculty_names %}
+              <option value="{{ faculty.name }}">{{ faculty.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      
+      <div class="filter-dept">
+        <label for="department-filter" class="form-label">Filter by Department:</label>
+        <div class="dropdown-container">
+          <select id="department-filter" class="custom-dropdown">
+            <option value="" selected disabled>Select Department</option>
+            {% for department in departments %}
+              <option value="{{ department.department }}">{{ department.department }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      
+  
+      <div class="filter-date mb-3">
+        <label for="employee-filter" class="form-label">Filter by Issue Date</label>
+        <div class="date-inputs">
+          <div class="date-input">
+            <label for="min">From</label>
+            <input type="text" id="min" name="min" placeholder="Select the Start Date">
+          </div>
+          <div class="date-input">
+            <label for="max">To</label>
+            <input type="text" id="max" name="max" placeholder="Select the End Date">
+          </div>
+        </div>
+      </div>
+
+      <button id="clear-filters" class="btn btn-secondary mt-3">Clear Filters</button>
+
+     
+    
+    </div>
+
+    
+    
+    <table id="example" class="table table-striped nowrap">
+      <thead>
+        <tr>
+          <th scope="col">Item Name</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Employee Name</th>
+          <th scope="col">Issue Date</th>
+          <th scope="col">Department</th>
+          <th scope="col">Reference No.</th>
+          <th scope="col">Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for issued_item in issued_items %}
+        <tr>
+          <td>{{ issued_item.ItemName.name }}</td>
+          <td>{{ issued_item.Quantity }}</td>
+          <td>{{ issued_item.Name_of_Employee.name }}</td>
+          <td>{{ issued_item.Issue_Date|date:"Y M d" }}</td>
+          <td>{{ issued_item.Department.department }}</td>
+          <td>{{ issued_item.Refrence_No}}</td>
+          <td>{{ issued_item.Location }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modal fade" id="newEntryModal" tabindex="-1" aria-labelledby="newEntryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="newEntryModalLabel">New Issued Entry</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="{% url 'issued' %}">
+            {% csrf_token %}
+
+            <div class="mb-2">
+              <label class="form-label" for="item_name">Item Name:</label>
+              <select name="item_name" required>
+                <option value="" selected disabled>Select an item</option>
+                {% for item in items %}
+                <option value="{{ item }}">{{ item }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+
+            <div class="mb-2">
+              <label class="form-label" for="quantity">Quantity:</label>
+              <input type="number" name="quantity" placeholder="eg. 10" required>
+            </div>
+
+            <div class="mb-2">
+
+              <label class="form-label" for="employee_name">Employee Name:</label>
+              <select name="employee_name" required>
+                <option value="" selected disabled>Select Employee</option>
+                {% for faculty in faculty_names %}
+                <option value="{{ faculty.name }}">{{ faculty.name }}</option>
+                {% endfor %}
+              </select>
+
+            </div>
+
+
+            <div class="mb-2">
+
+              <label class="form-label" for="issue_date">Issue Date:</label>
+              <input type="date" class="form-control" name="issue_date" id="issue_date" required>
+
+            </div>
+
+            <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                var today = new Date().toISOString().split('T')[0];
+                document.getElementById('issue_date').value = today;
+              });
+              </script>
+
+            <div class="mb-2">
+
+              <label class="form-label" for="department">Department:</label>
+              <select name="department" required>
+                <option value="" selected disabled>Select Department</option>
+                {% for department in departments %}
+                <option value="{{ department.department }}">{{ department.department }}</option>
+                {% endfor %}
+              </select>
+
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label" for="refrence_No">Reference No:</label>
+              <input type="text" placeholder="eg. BCA/1-10" class="form-control" name="refrence_No" required>
+            </div>
+
+            <div class="mb-2">
+
+              <label class="form-label" for="location">Location:</label>
+              <input type="text" placeholder="eg. Lab 5" class="form-control" name="location" required>
+
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+  <script>
+</script>
+
+<script>
+    // Add Employee Name filter
+    $('#employee-filter').on('change', function () {
+      table.column(2).search($(this).val()).draw();
+    });
+    //Deptartment filter
+    $('#department-filter').on('change', function () {
+      table.column(4).search($(this).val()).draw();
+    });
+ 
+ DataTable.ext.search.push(function (settings, data, dataIndex) {
+      let min = parseDate($('#min').val());
+      let max = parseDate($('#max').val());
+      let date = parseDate(data[3]);
+
+      if (
+        (min === null && max === null) ||
+        (min === null && date <= max) ||
+        (min <= date && max === null) ||
+        (min <= date && date <= max)
+      ) {
+        return true;
+      }
+      return false;
+    });
+
+    let minDate = new DateTime('#min', {
+      format: 'YYYY MMM DD'
+    });
+    let maxDate = new DateTime('#max', {
+      format: 'YYYY MMM DD'
+    });
+
+    var table = new DataTable('#example',{
+    lengthMenu: [
+        [25, 50, -1],
+        [25, 50, 'All']
+    ]
+});
+    document.querySelectorAll('#min, #max').forEach((el) => {
+      el.addEventListener('change', () => table.draw());
+    });
+
+    function parseDate(dateString) {
+      if (!dateString) return null;
+
+      const parts = dateString.split(' ');
+      if (parts.length !== 3) return null;
+
+      const year = parseInt(parts[0]);
+      const month = parseMonth(parts[1]);
+      const day = parseInt(parts[2]);
+
+      if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+
+      return new Date(year, month, day);
+    }
+    function parseMonth(monthAbbreviation) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthIndex = months.indexOf(monthAbbreviation);
+      return monthIndex !== -1 ? monthIndex : NaN;
+    }
+  
+    $('#clear-filters').on('click', function () {
+  // Check if Employee Name filter is active
+  if ($('#employee-filter').val() !== null) {
+    $('#employee-filter').val('').trigger('change');
+  }
+
+  if ($('#department-filter').val() !== null) {
+    $('#department-filter').val('').trigger('change');
+  }
+
+  // Empty the date inputs
+  $('#min').val('');
+  $('#max').val('');
+
+  // Trigger change event to ensure DataTable is updated
+  $('#min, #max').trigger('change');
+
+  // Clear DataTable filters without affecting visibility
+  table.search('').columns().search('').draw();
+});
+
+</script>
+
+</body>
+
+</html>
